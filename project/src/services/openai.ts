@@ -1,9 +1,18 @@
 import { Message, FileAttachment } from "../types";
 
-const OPENAI_API_KEY = "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";  // Replace with your OpenAI API key
-const ASSISTANT_ID = "asst_vhNKnEXKMrsSdYs4OJw3NYq5";  
-const OPENAI_API_URL = "https://api.openai.com/v1/threads";
+async function sendMessage(messages) {
+  const response = await fetch("/.netlify/functions/openai-chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ messages }),
+  });
 
+  const data = await response.json();
+  return data;
+}  
+const OPENAI_API_URL = "https://api.openai.com/v1/threads";
 export async function sendMessageToOpenAI(
   messages: Message[],
   attachments: FileAttachment[]
