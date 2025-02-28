@@ -1,29 +1,34 @@
-require("dotenv").config();
-const fetch = require("node-fetch");
+// netlify/functions/openai-chat.js
+const fetch = require("node-fetch"); // This is still required for making HTTP requests.
 
-exports.handler = async function (event) {
+exports.handler = async function(event, context) {
   try {
-    const { messages } = JSON.parse(event.body);
+    // Access your OpenAI API key from environment variables
+    const apiKey = process.env.OPENAI_API_KEY;
+    const assistantId = process.env.OPENAI_ASSISTANT_ID; // Use the Assistant ID from environment variables
 
+    // Construct your API request
     const response = await fetch("https://api.openai.com/v1/threads", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`, // Use the API key securely
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        assistant_id: process.env.OPENAI_ASSISTANT_ID, // Use the Assistant ID
-        messages,
+        assistant_id: assistantId, // Use the Assistant ID
+        messages: event.body.messages, // Assuming you're passing messages in the request body
       }),
     });
 
-    const data = await response.json();
+    const data = await response.json(); // Parse the response
+
+    // Return the result from OpenAI API
     return {
       statusCode: 200,
       body: JSON.stringify(data),
     };
   } catch (error) {
-    console.error("OpenAI API error:", error);
+    console.error("OpenAI API error:", error); // Log any errors for debugging
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Failed to fetch response" }),
