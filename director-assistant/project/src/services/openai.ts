@@ -1,18 +1,8 @@
-import { Message, FileAttachment } from "../types";
+const OPENAI_API_KEY = "your-api-key-here"; // Ensure this is set properly
+const ASSISTANT_ID = "your-assistant-id";  // Make sure this is defined
 
-async function sendMessage(messages) {
-  const response = await fetch("/.netlify/functions/openai-chat", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ messages }),
-  });
-
-  const data = await response.json();
-  return data;
-}  
 const OPENAI_API_URL = "https://api.openai.com/v1/threads";
+
 export async function sendMessageToOpenAI(
   messages: Message[],
   attachments: FileAttachment[]
@@ -34,6 +24,10 @@ export async function sendMessageToOpenAI(
       body: JSON.stringify({ messages: formattedMessages }),
     });
 
+    if (!threadResponse.ok) {
+      throw new Error(`Failed to create thread: ${threadResponse.statusText}`);
+    }
+
     const threadData = await threadResponse.json();
     const threadId = threadData.id;
 
@@ -47,8 +41,12 @@ export async function sendMessageToOpenAI(
       body: JSON.stringify({ assistant_id: ASSISTANT_ID }),
     });
 
+    if (!runResponse.ok) {
+      throw new Error(`Failed to run assistant: ${runResponse.statusText}`);
+    }
+
     const runData = await runResponse.json();
-    
+
     // Fetch the response from OpenAI
     const messagesResponse = await fetch(`${OPENAI_API_URL}/${threadId}/messages`, {
       method: "GET",
@@ -57,6 +55,10 @@ export async function sendMessageToOpenAI(
         "Content-Type": "application/json",
       },
     });
+
+    if (!messagesResponse.ok) {
+      throw new Error(`Failed to fetch messages: ${messagesResponse.statusText}`);
+    }
 
     const messagesData = await messagesResponse.json();
     const assistantMessage = messagesData.data.find(m => m.role === "assistant");
