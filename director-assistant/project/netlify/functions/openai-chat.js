@@ -1,7 +1,6 @@
-// netlify/functions/openai-chat.js
-const fetch = require("node-fetch"); // This is still required for making HTTP requests.
+import fetch from 'node-fetch'; // Importing node-fetch using ESM syntax
 
-exports.handler = async function(event, context) {
+export const handler = async function(event, context) {
   try {
     // Access your OpenAI API key from environment variables
     const apiKey = process.env.OPENAI_API_KEY;
