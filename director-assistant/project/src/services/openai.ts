@@ -1,11 +1,13 @@
-const OPENAI_API_KEY = "your-api-key-here"; // Ensure this is set properly
-const ASSISTANT_ID = "your-assistant-id";  // Make sure this is defined
+import { Message, FileAttachment } from "../types"; // Import your types from the file where they are defined
+
+const OPENAI_API_KEY = "your-api-key-here"; // Replace with your actual API key
+const ASSISTANT_ID = "your-assistant-id";  // Replace with your actual Assistant ID
 
 const OPENAI_API_URL = "https://api.openai.com/v1/threads";
 
 export async function sendMessageToOpenAI(
-  messages: Message[],
-  attachments: FileAttachment[]
+  messages: Message[],        // Array of Message objects
+  attachments: FileAttachment[]  // Array of FileAttachment objects
 ): Promise<string> {
   try {
     // Prepare the conversation history
@@ -61,7 +63,7 @@ export async function sendMessageToOpenAI(
     }
 
     const messagesData = await messagesResponse.json();
-    const assistantMessage = messagesData.data.find(m => m.role === "assistant");
+    const assistantMessage = messagesData.data.find(m.role === "assistant");
 
     return assistantMessage?.content || "I didn't receive a response from the AI.";
   } catch (error) {
